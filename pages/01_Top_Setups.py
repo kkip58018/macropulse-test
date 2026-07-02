@@ -1,10 +1,23 @@
 import streamlit as st
 import pandas as pd
 from analyzer import init_analyzer as get_analyzer
+from streamlit_cookies_controller import CookieController
 
+# 1. Initialize the cookie reader
+controller = CookieController()
+
+# 2. If the session state was wiped by a refresh, try to rebuild it from the cookie FIRST
+if "authenticated" not in st.session_state:
+    # Check if the browser has our login cookie
+    if controller.get("user_logged_in") == "true":
+        st.session_state.authenticated = True
+    else:
+        st.session_state.authenticated = False
+
+# 3. NOW check if they are allowed to be here
 if not st.session_state.get("authenticated", False):
-    st.warning("Please log in on the Home page first.")
-    st.stop()
+    # Instead of showing a dead warning page, instantly boot them to the login screen
+    st.switch_page("app.py")
 
 analyzer = get_analyzer()
 
