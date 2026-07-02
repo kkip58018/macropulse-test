@@ -417,6 +417,26 @@ st.markdown(
         color: #ffffff !important;
         font-weight: 600 !important;
     }
+    /* Hide the main "app.py" link from the sidebar menu list */
+    [data-testid="stSidebarNav"] ul li:first-child {
+        display: none !important;
+    }
+    /* Hide any top title/header container generated inside the nav */
+    [data-testid="stSidebarNav"] > div:first-child {
+        display: none !important;
+    }
+    /* Increase the font size of all sidebar navigation text links */
+    [data-testid="stSidebarNav"] a span {
+        font-size: 1.15rem !important; 
+        font-weight: 500 !important;
+        color: #e2e8f0 !important;
+    }
+    /* Style the currently active sidebar link text size and color */
+    [data-testid="stSidebarNav"] a[aria-current="page"] span {
+        font-size: 1.2rem !important;
+        color: #00ff88 !important;
+        font-weight: 700 !important;
+    }
 </style>
 """,
     unsafe_allow_html=True,
