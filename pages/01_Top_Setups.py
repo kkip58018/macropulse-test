@@ -6,6 +6,13 @@ from streamlit_cookies_controller import CookieController
 # 1. Initialize the cookie reader
 controller = CookieController()
 
+# Check the URL first to see if they survived a refresh
+if st.query_params.get("auth") == "true":
+    st.session_state.authenticated = True
+
+# Now check security
+if not st.session_state.get("authenticated", False):
+    st.switch_page("app.py")
 # 2. If the session state was wiped by a refresh, try to rebuild it from the cookie FIRST
 if "authenticated" not in st.session_state:
     # Check if the browser has our login cookie
