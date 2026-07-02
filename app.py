@@ -499,8 +499,11 @@ def sign_in(email, password):
                 return False, "User profile not found in database."
 
             save_session(response.session, email)
-            controller.set("user_logged_in", "true")
+            # When login is successful
             st.session_state.authenticated = True
+            # Put a flag in the browser's URL (e.g., yoursite.com/?auth=true)
+            st.query_params["auth"] = "true" 
+            st.switch_page("pages/01_Top_Setups.py")
             
             return True, "Success"
             
