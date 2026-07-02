@@ -1,4 +1,5 @@
 import streamlit as st
+import yfinance as yf
 import plotly.graph_objects as go
 from datetime import datetime
 from analyzer import init_analyzer as get_analyzer
