@@ -1008,4 +1008,4 @@ if not st.session_state.authenticated:
         show_landing_page()
     st.stop()
 
-st.switch_page("pages/top_setups.py")
+st.switch_page("pages/1_top_setups.py")
