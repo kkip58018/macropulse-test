@@ -39,37 +39,37 @@ st.markdown(
     }
     
     /* ---------------- CUSTOM SIDEBAR FIXES ---------------- */
-    /* HIDE MAIN APP LINK: Target the very first <a> (link) tag inside the nav */
-    [data-testid="stSidebarNav"] a:first-of-type,
-    [data-testid="stSidebarNav"] > div > a:first-child,
-    [data-testid="stSidebarNav"] > div > div > a:first-child {
+    
+    /* 1. HIDE THE FIRST LINK: Target the specific Streamlit nav link ID */
+    a[data-testid="stSidebarNavLink"]:first-of-type {
         display: none !important;
     }
     
-    /* REMOVE EXTRA HEADER SPACE in the nav */
-    [data-testid="stSidebarNav"] > div:first-child {
-        padding-top: 0 !important;
-    }
-    
-    /* INCREASE PADDING: Add breathing room inside the clickable link area */
-    [data-testid="stSidebarNav"] a {
-        padding-top: 0.75rem !important;
-        padding-bottom: 0.75rem !important;
+    /* 2. INCREASE PADDING: Make the clickable box much taller and add space between */
+    a[data-testid="stSidebarNavLink"] {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
         margin-bottom: 0.5rem !important;
     }
     
-    /* INCREASE FONT SIZE: Target the text spans directly */
-    [data-testid="stSidebarNav"] span {
-        font-size: 1.25rem !important; 
+    /* 3. INCREASE FONT SIZE: Target the text spans inside the new link ID */
+    a[data-testid="stSidebarNavLink"] span {
+        font-size: 1.25rem !important;
         font-weight: 500 !important;
         color: #e2e8f0 !important;
     }
     
-    /* STYLE ACTIVE PAGE: Make the current page even larger and neon green */
-    [data-testid="stSidebarNav"] a[aria-current="page"] span {
+    /* 4. STYLE THE ACTIVE PAGE: Neon green and larger */
+    a[data-testid="stSidebarNavLink"][aria-current="page"] span {
         font-size: 1.35rem !important;
         color: #00ff88 !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
+    }
+    
+    /* 5. REMOVE TOP GAP: Hide the hidden page container space */
+    [data-testid="stSidebarNav"]::before,
+    [data-testid="stSidebarNav"] > div:first-child {
+        display: none !important;
     }
     /* ----------------------------------------------------- */
     /* Sticky Navbar */
