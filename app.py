@@ -152,11 +152,11 @@ def show_auth_page():
                 if success:
                     st.session_state.authenticated = True
                     st.session_state.show_auth = False
-                    st.success("Loading your dashboard....")
+                    st.success("Login successful! Redirecting...")
                     time.sleep(0.5) # Give the user half a second to read the success message
                     
                     # 🚀 REDIRECT DIRECTLY TO TOP SETUPS PAGE
-                    st.switch_page("pages/top_setups.py")
+                    st.switch_page("pages/1_top_setups.py")
                 else:
                     st.error(msg)
         
@@ -210,4 +210,7 @@ if not st.session_state.authenticated:
         show_landing_page()
     st.stop()
 
-st.switch_page("pages/top_setups.py")
+# --- IF AUTHENTICATED ---
+# If an authenticated user somehow navigates back to the root `app.py` URL, 
+# instantly bounce them to the primary dashboard so they don't see a blank page.
+st.switch_page("pages/1_top_setups.py")
