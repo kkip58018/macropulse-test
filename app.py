@@ -1,5 +1,6 @@
 
 
+
 import streamlit as st
 import time
 from db import supabase_auth, supabase_admin
@@ -38,36 +39,35 @@ st.markdown(
     }
     
     /* ---------------- CUSTOM SIDEBAR FIXES ---------------- */
-    /* BRUTE FORCE: Hide the first link (app.py) from the sidebar menu */
-    [data-testid="stSidebarNav"] ul li:nth-child(1),
-    [data-testid="stSidebarNavItems"] li:nth-child(1) {
+    /* HIDE MAIN APP LINK: Target the very first <a> (link) tag inside the nav */
+    [data-testid="stSidebarNav"] a:first-of-type,
+    [data-testid="stSidebarNav"] > div > a:first-child,
+    [data-testid="stSidebarNav"] > div > div > a:first-child {
         display: none !important;
     }
     
-    /* Hide any top title/header container generated inside the nav */
+    /* REMOVE EXTRA HEADER SPACE in the nav */
     [data-testid="stSidebarNav"] > div:first-child {
-        display: none !important;
+        padding-top: 0 !important;
     }
     
-    /* INCREASE PADDING AND SPACING for the clickable link boxes */
-    [data-testid="stSidebarNav"] ul li a,
-    [data-testid="stSidebarNavItems"] li a {
-        padding: 1rem 1.2rem !important;  /* Bumping up the padding inside the link */
-        margin-bottom: 0.5rem !important; /* Adding space between each link */
+    /* INCREASE PADDING: Add breathing room inside the clickable link area */
+    [data-testid="stSidebarNav"] a {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+        margin-bottom: 0.5rem !important;
     }
     
-    /* INCREASE FONT SIZE of all sidebar navigation text */
-    [data-testid="stSidebarNav"] a span,
-    [data-testid="stSidebarNavItems"] a span {
-        font-size: 1.3rem !important; /* Noticeably larger font */
+    /* INCREASE FONT SIZE: Target the text spans directly */
+    [data-testid="stSidebarNav"] span {
+        font-size: 1.25rem !important; 
         font-weight: 500 !important;
         color: #e2e8f0 !important;
     }
     
-    /* Style the CURRENTLY ACTIVE sidebar link */
-    [data-testid="stSidebarNav"] a[aria-current="page"] span,
-    [data-testid="stSidebarNavItems"] a[aria-current="page"] span {
-        font-size: 1.4rem !important; /* Active link is even larger */
+    /* STYLE ACTIVE PAGE: Make the current page even larger and neon green */
+    [data-testid="stSidebarNav"] a[aria-current="page"] span {
+        font-size: 1.35rem !important;
         color: #00ff88 !important;
         font-weight: 700 !important;
     }
