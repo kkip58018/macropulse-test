@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db import supabase_auth, supabase_admin, save_session
+from db import supabase_auth, supabase_admin, save_session,get_session_file,load_session
 from analyzer import init_analyzer
 
 # ======================= PRE-CONFIG CHECK =======================
@@ -125,55 +125,530 @@ def sign_up(email, password):
     except Exception as e:
         return False, f"Signup error: {str(e)}"
 
-# ======================= UI COMPONENTS =======================
+# ======================= LANDING PAGE =======================
 def show_landing_page():
-    st.markdown("<div class='hero-title'>MacroPulse</div>", unsafe_allow_html=True)
-    st.markdown("<div class='hero-subtitle'>Institutional-Grade Macroeconomic Intelligence</div>", unsafe_allow_html=True)
+    # CSS with reliable typewriter effect + contact section styling
+    st.markdown(
+        """
+    <style>
+    /* Typewriter container */
+    .typewriter-wrapper {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    .typewriter {
+        display: inline-block;
+        overflow: hidden;
+        border-right: 3px solid #00ff88;
+        white-space: nowrap;
+        margin: 0 auto;
+        animation: typing 3.5s steps(40, end) forwards,
+                   blink-caret 0.75s step-end infinite;
+        font-size: clamp(2rem, 8vw, 3.5rem);
+        font-weight: 800;
+        background: linear-gradient(135deg, #00ff88, #00b8ff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: #00ff88; /* fallback */
+        line-height: 1.2;
+        width: 0;
+    }
+    @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+    @keyframes blink-caret {
+        from, to { border-color: transparent; }
+        50% { border-color: #00ff88; }
+    }
+
+    /* Fade in for subtitle and CTA */
+    @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .hero-subtitle-animated {
+        font-size: 1.3rem;
+        color: #94a3b8;
+        margin-bottom: 2rem;
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out 0.5s forwards;
+        opacity: 0;
+        animation-fill-mode: forwards;
+    }
+    .cta-button-wrapper {
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out 1s forwards;
+        opacity: 0;
+        animation-fill-mode: forwards;
+    }
     
-    col1, col2, col3 = st.columns([1.5, 1, 1.5])
+    /* Social proof section */
+    .social-proof-section {
+        padding: 2rem 2rem 4rem 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    .stat-item {
+        background-color: #0f131a;
+        border: 1px solid #1e2430;
+        border-radius: 16px;
+        padding: 1.5rem;
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00ff88, #00b8ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+        color: #94a3b8;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+    .quote-text {
+        font-size: 1.2rem;
+        color: #e2e8f0;
+        font-style: italic;
+        margin-bottom: 1rem;
+    }
+    .quote-author {
+        color: #00ff88;
+        font-weight: 500;
+    }
+
+    /* Contact Section */
+    .contact-section {
+        padding: 4rem 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        background-color: #0b0f15;
+        border-top: 1px solid #1e2430;
+    }
+    .contact-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 1rem;
+    }
+    .contact-subtitle {
+        color: #94a3b8;
+        font-size: 1.2rem;
+        margin-bottom: 2.5rem;
+    }
+    .contact-card {
+        background-color: #0f131a;
+        border: 1px solid #1e2430;
+        border-radius: 16px;
+        padding: 2rem;
+        display: inline-block;
+        text-align: left;
+        max-width: 500px;
+        width: 100%;
+    }
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .contact-icon {
+        font-size: 1.8rem;
+        width: 2.5rem;
+        text-align: center;
+    }
+    .contact-detail {
+        color: #e2e8f0;
+        font-size: 1.1rem;
+    }
+    .contact-detail a {
+        color: #00ff88;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .contact-detail a:hover {
+        color: #00b8ff;
+        text-decoration: underline;
+    }
+    .contact-note {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+
+    /* Mobile fallback */
+    @media (max-width: 600px) {
+        .typewriter {
+            white-space: normal;
+            border-right: none;
+            animation: none;
+            width: auto;
+            font-size: 2rem;
+        }
+        .contact-card {
+            padding: 1.5rem;
+        }
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # Custom navbar
+    col1, col2, col3 = st.columns([2, 5, 1])
+    with col1:
+        st.markdown(
+            '<div class="landing-logo">📊 MacroPulse</div>', unsafe_allow_html=True
+        )
     with col2:
-        if st.button("Enter Dashboard", use_container_width=True, type="primary"):
+        st.markdown(
+            """
+        <div class="nav-links" style="justify-content: center; padding-top: 0.5rem;">
+            <a href="#features">Features</a>
+            <a href="#value">Why Us</a>
+            <a href="#contact">Contact</a>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+    with col3:
+        if st.button("🔐 Login", key="nav_login_btn", use_container_width=True):
             st.session_state.show_auth = True
             st.rerun()
 
+    # Hero Section
+    st.markdown(
+        """
+    <div class="hero-section">
+        <div class="typewriter-wrapper">
+            <div class="typewriter">Trade with Institutional Clarity</div>
+        </div>
+        <div class="hero-subtitle-animated">Stop guessing. Start trading with a data‑driven edge that combines institutional positioning, macro surprises, and seasonal patterns into one clear direction.</div>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # CTA Button
+    st.markdown('<div class="cta-button-wrapper">', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button(
+            "🚀 Get Started — It's Free", use_container_width=True, key="cta_button"
+        ):
+            st.session_state.show_auth = True
+            st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Value Proposition (3 cards)
+    st.markdown(
+        """
+    <div class="value-section" id="value">
+        <div class="value-grid">
+            <div class="value-card">
+                <div class="value-icon">🏦</div>
+                <div class="value-title">Trade What the Smart Money Sees</div>
+                <div class="value-desc">COT positioning, retail sentiment, and macro surprises — the same data hedge funds use, now accessible to you in seconds.</div>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">📈</div>
+                <div class="value-title">Spot High‑Probability Setups Instantly</div>
+                <div class="value-desc">Our scoring system surfaces the most compelling long and short opportunities, saving you hours of manual analysis every week.</div>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">⏱️</div>
+                <div class="value-title">From Hours to Seconds</div>
+                <div class="value-desc">Stop manually checking economic calendars, COT reports, and charts. MacroPulse does the heavy lifting so you can focus on execution.</div>
+            </div>
+        </div>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # Social Proof / Metrics Section
+    st.markdown(
+        """
+    <div class="social-proof-section">
+        <div class="quote-text">"MacroPulse has completely changed how I approach forex. The combined score gives me conviction I never had before."</div>
+        <div class="quote-author">— Michael R., Full‑Time Trader</div>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">28</div>
+                <div class="stat-label">Currency Pairs Covered</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Independent Factors Combined</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Cloud‑Based & Secure</div>
+            </div>
+        </div>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # Features Section (5 cards)
+    st.markdown(
+        """
+    <div class="features-section" id="features">
+        <div class="section-title">Everything You Need to Trade Smarter</div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <div class="feature-title">Deep‑Dive Scorecard</div>
+                <div class="feature-desc">Click any pair to see exactly why it scored the way it did. Understand the "why" behind every recommendation.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌡️</div>
+                <div class="feature-title">Currency Strength at a Glance</div>
+                <div class="feature-desc">Intuitive heatmap and gauges show which currencies are fundamentally strong or weak — no spreadsheet required.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Institutional COT Tracker</div>
+                <div class="feature-desc">See how the "big money" is positioned and how it's changing week‑to‑week. Never trade against the dominant flow again.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📆</div>
+                <div class="feature-title">Live Economic Radar</div>
+                <div class="feature-desc">Plan your week around high‑impact news. Update actuals with one click and watch the scores adjust automatically.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🍂</div>
+                <div class="feature-title">Seasonal Edge</div>
+                <div class="feature-desc">Leverage historical monthly biases and recurring trend windows. Trade with the calendar, not against it.</div>
+            </div>
+        </div>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # Contact Section
+    st.markdown(
+        """
+    <div class="contact-section" id="contact">
+        <div class="contact-title">Get in Touch</div>
+        <div class="contact-subtitle">Have questions? We're here to help.</div>
+        <div class="contact-card">
+            <div class="contact-item">
+                <div class="contact-icon">📧</div>
+                <div class="contact-detail">
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=kkip58018@gmail.com">support@macropulse.io</a>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">💬</div>
+                <div class="contact-detail">
+                    <a href="https://chat.whatsapp.com/LwqzoUatXMCHzRRCoQRtFG?mode=gi_t" target="https://chat.whatsapp.com/LwqzoUatXMCHzRRCoQRtFG?mode=gi_t">Join our WhatsApp Community</a>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">🐦</div>
+                <div class="contact-detail">
+                    <a href="#" target="_blank">Follow @MacroPulse</a>
+                </div>
+            </div>
+            <div class="contact-note">
+                We typically respond within 24 hours.
+            </div>
+        </div>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # Footer
+    st.markdown(
+        """
+    <div class="footer">
+        <p>© 2025 MacroPulse. All rights reserved. | <a href="#" style="color: #64748b; text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: #64748b; text-decoration: none;">Terms of Service</a></p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Forex trading involves substantial risk. Past performance does not guarantee future results.</p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+# ======================= AUTHENTICATION PAGE =======================
 def show_auth_page():
-    st.markdown("<div class='hero-title'>MacroPulse</div>", unsafe_allow_html=True)
-    st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
-    
+    # Initialize auth mode if not set
+    if "auth_mode" not in st.session_state:
+        st.session_state.auth_mode = "login"
+
+    # CSS for card layout and outline buttons (same as before)
+    st.markdown(
+        """
+    <style>
+        header[data-testid="stHeader"] {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            min-height: 0 !important;
+        }
+        .block-container {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            max-width: 900px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        .stApp {
+            background-color: #0b0f15 !important;
+        }
+        .auth-card {
+            background-color: #0f131a !important;
+            border: 1px solid #1e2430 !important;
+            border-radius: 16px !important;
+            padding: 2rem !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
+            margin-top: 2rem !important;
+        }
+        .auth-title {
+            text-align: center;
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 2.5rem;
+            margin-top: 200px;
+        }
+        div[data-testid="stTextInput"] input {
+            background-color: #1e2430 !important;
+            color: white !important;
+            border: 1px solid #2a3340 !important;
+            border-radius: 8px !important;
+            padding: 0.75rem !important;
+        }
+        div[data-testid="stFormSubmitButton"] > button {
+            background: transparent !important;
+            color: white !important;
+            font-weight: bold !important;
+            border: 1px solid grey !important;
+            border-radius: 8px !important;
+            padding: 0.75rem 1.5rem !important;
+            width: 100% !important;
+            transition: all 0.2s !important;
+        }
+        div[data-testid="stFormSubmitButton"] button:hover {
+            background: #3c3c3c !important;
+            border-color: #00b8ff !important;
+        }
+        .toggle-btn-container {
+            text-align: center;
+            margin-top: 1.0rem;
+        }
+        .toggle-btn-container button {
+            background: transparent !important;
+            color: #00ff88 !important;
+            border: none !important;
+            font-weight: 500;
+            padding: 0 !important;
+            margin: 0 !important;
+            text-decoration: none;
+        }
+        .toggle-btn-container button:hover {
+            text-decoration: underline !important;
+            color: #00b8ff !important;
+        }
+        div[data-testid="stButton"] > button {
+            background: transparent !important;
+            color: #94a3b8 !important;
+            border: 1px solid #2a3340 !important;
+            border-radius: 8px !important;
+        }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
     if st.session_state.auth_mode == "login":
-        st.markdown("<h3 style='text-align: center; color: white;'>Log In</h3>", unsafe_allow_html=True)
+        st.markdown(
+            '<div class="auth-title">Welcome Back</div>', unsafe_allow_html=True
+        )
+
+        # --- Login Form ---
         with st.form("login_form"):
             email = st.text_input("Email", key="login_email")
             password = st.text_input("Password", type="password", key="login_password")
-            submitted = st.form_submit_button("Log In", use_container_width=True)
-            
+            submitted = st.form_submit_button("Sign In")
+
+            # --- Automatic Session Restoration ---
+            # Check if we have a saved session for this email (only when email changes)
+            if email and "last_checked_email" not in st.session_state:
+                st.session_state.last_checked_email = None
+
+            if email and email != st.session_state.get("last_checked_email"):
+                st.session_state.last_checked_email = email
+                # Try to restore session from file
+                if load_session(email):
+                    # Successfully restored – update session state and log in
+                    session = supabase_auth.auth.get_session()
+                    if session and session.user:
+                        profile = (
+                            supabase_admin.table("user_profiles")
+                            .select("approved, is_admin")
+                            .eq("id", session.user.id)
+                            .execute()
+                        )
+                        if profile.data and profile.data[0].get("approved", False):
+                            st.session_state.authenticated = True
+                            st.session_state.user_email = email
+                            st.session_state.is_admin = profile.data[0].get(
+                                "is_admin", False
+                            )
+                            st.session_state.show_auth = False
+                            st.rerun()
+                        else:
+                            # User not approved anymore – clear the file
+                            file_path = get_session_file(email)
+                            file_path.unlink(missing_ok=True)
+                            st.warning("Your account is no longer approved.")
+                # If restoration fails, we just continue showing the login form
+
             if submitted:
                 success, msg = sign_in(email, password)
                 if success:
-                    st.session_state.authenticated = True
-                    st.session_state.show_auth = False
-                    st.success("Login successful! Redirecting...")
-                    time.sleep(0.5) # Give the user half a second to read the success message
-                    
-                    # 🚀 REDIRECT DIRECTLY TO TOP SETUPS PAGE
-                    st.switch_page("pages/1_top_setups.py")
+                    st.rerun()
                 else:
                     st.error(msg)
-        
-        st.markdown("<div class='toggle-btn-container'>", unsafe_allow_html=True)
-        if st.button("Need an account? Register here", key="switch_to_signup"):
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # Toggle to Sign Up
+        st.markdown('<div class="toggle-btn-container">', unsafe_allow_html=True)
+        if st.button("Don't have an account? Sign up", key="switch_to_signup"):
             st.session_state.auth_mode = "signup"
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    else:
-        st.markdown("<h3 style='text-align: center; color: white;'>Register</h3>", unsafe_allow_html=True)
+    else:  # signup mode
+        st.markdown(
+            '<div class="auth-title">Create Account</div>', unsafe_allow_html=True
+        )
+
         with st.form("signup_form"):
             new_email = st.text_input("Email", key="signup_email")
-            new_password = st.text_input("Password", type="password", key="signup_password")
-            confirm = st.text_input("Confirm Password", type="password", key="signup_confirm")
-            submitted = st.form_submit_button("Register", use_container_width=True)
-            
+            new_password = st.text_input(
+                "Password", type="password", key="signup_password"
+            )
+            confirm = st.text_input(
+                "Confirm Password", type="password", key="signup_confirm"
+            )
+            submitted = st.form_submit_button("Register")
             if submitted:
                 if new_password != confirm:
                     st.error("Passwords do not match")
@@ -183,23 +658,22 @@ def show_auth_page():
                         st.success(msg)
                     else:
                         st.error(msg)
-                        
-        st.markdown("<div class='toggle-btn-container'>", unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # Toggle to Login
+        st.markdown('<div class="toggle-btn-container">', unsafe_allow_html=True)
         if st.button("← Back to Login", key="switch_to_login"):
             st.session_state.auth_mode = "login"
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Back to Home button (outside the card)
-    st.markdown("<br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1.5, 1, 1.5])
-    with col2:
-        if st.button("← Back to Home", use_container_width=True):
-            st.session_state.show_auth = False
-            st.session_state.auth_mode = "login"
-            st.rerun()
+    # Back to Home button (outside card)
+    if st.button("← Back to Home"):
+        st.session_state.show_auth = False
+        st.session_state.auth_mode = "login"
+        st.rerun()
+
 
 # ======================= MAIN APP ROUTING =======================
 if not st.session_state.authenticated:
@@ -210,7 +684,4 @@ if not st.session_state.authenticated:
         show_landing_page()
     st.stop()
 
-# --- IF AUTHENTICATED ---
-# If an authenticated user somehow navigates back to the root `app.py` URL, 
-# instantly bounce them to the primary dashboard so they don't see a blank page.
-st.switch_page("pages/1_top_setups.py")
+st.switch_page("pages/top_setups.py")
