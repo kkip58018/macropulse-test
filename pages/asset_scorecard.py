@@ -1,5 +1,9 @@
 import streamlit as st
+from tradingview_ta import TA_Handler, Interval
+import yfinance as yf
 from datetime import datetime
+import plotly.graph_objects as go
+from config import *
 from analyzer import init_analyzer as get_analyzer
 
 if not st.session_state.get("authenticated", False):
