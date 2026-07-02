@@ -931,50 +931,22 @@ def show_auth_page():
         st.markdown(
             '<div class="auth-title">Welcome Back</div>', unsafe_allow_html=True
         )
-
-        # --- Login Form ---
         with st.form("login_form"):
             email = st.text_input("Email", key="login_email")
             password = st.text_input("Password", type="password", key="login_password")
-            submitted = st.form_submit_button("Sign In")
-
-            # --- Automatic Session Restoration ---
-            # Check if we have a saved session for this email (only when email changes)
-            if email and "last_checked_email" not in st.session_state:
-                st.session_state.last_checked_email = None
-
-            if email and email != st.session_state.get("last_checked_email"):
-                st.session_state.last_checked_email = email
-                # Try to restore session from file
-                if load_session(email):
-                    # Successfully restored – update session state and log in
-                    session = supabase_auth.auth.get_session()
-                    if session and session.user:
-                        profile = (
-                            supabase_admin.table("user_profiles")
-                            .select("approved, is_admin")
-                            .eq("id", session.user.id)
-                            .execute()
-                        )
-                        if profile.data and profile.data[0].get("approved", False):
-                            st.session_state.authenticated = True
-                            st.session_state.user_email = email
-                            st.session_state.is_admin = profile.data[0].get(
-                                "is_admin", False
-                            )
-                            st.session_state.show_auth = False
-                            st.rerun()
-                        else:
-                            # User not approved anymore – clear the file
-                            file_path = get_session_file(email)
-                            file_path.unlink(missing_ok=True)
-                            st.warning("Your account is no longer approved.")
-                # If restoration fails, we just continue showing the login form
-
+            submitted = st.form_submit_button("Log In", use_container_width=True)
+            
             if submitted:
-                success, msg = sign_in(email, password)
+                # Added .strip() to prevent accidental spaces from breaking auth
+                success, msg = sign_in(email.strip(), password) 
                 if success:
-                    st.rerun()
+                    st.session_state.authenticated = True
+                    st.session_state.show_auth = False
+                    st.success("Login successful! Redirecting...")
+                    time.sleep(0.5) 
+                    
+                    # 🔄 REPLACED st.switch_page with st.rerun()
+                    st.rerun() 
                 else:
                     st.error(msg)
 
