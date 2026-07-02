@@ -12,3 +12,4 @@ beautifulsoup4
 cloudscraper
 lxml
 cot_reports
+streamlit-cookies-controller
