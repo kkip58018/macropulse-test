@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from analyzer import init_analyzer as get_analyzer
 from config import *
 
