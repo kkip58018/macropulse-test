@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import cloudscraper
 import re
 from bs4 import BeautifulSoup
