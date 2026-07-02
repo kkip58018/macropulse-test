@@ -15,12 +15,16 @@ st.set_page_config(
 )
 
 # ======================= GLOBAL STYLES =======================
-# Base CSS that applies everywhere
-base_css = """
+st.markdown(
+    """
 <style>
     /* Hide toolbar and decoration */
-    [data-testid="stToolbar"] { display: none !important; }
-    [data-testid="stDecoration"] { display: none !important; }
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
+    [data-testid="stDecoration"] {
+        display: none !important;
+    }
     
     /* Base app background */
     .stApp {
@@ -28,47 +32,395 @@ base_css = """
         padding-top: 0 !important;
     }
 
-    /* Default padding removal */
+    /* Default: no extra padding for unauthenticated pages (header hidden) */
     .block-container {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
         margin-top: 0 !important;
     }
-
-    /* Hero / Auth custom styles */
-    .hero-title {
-        font-size: 4rem;
-        font-weight: 800;
-        color: white;
-        text-align: center;
-        margin-top: 10vh;
-        background: linear-gradient(90deg, #00ff88, #00b8ff);
+    
+    /* When authenticated, the header is visible so we need space */
+    .stApp[data-testid="stApp"] .block-container {
+        /* Overridden later if authenticated */
+    }
+    
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background-color: #0f131a;
+        border-right: 1px solid #1e2430;
+    }
+    
+    /* Sticky Navbar (your custom landing nav) */
+    .landing-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background-color: #0f131a;
+        border-bottom: 1px solid #1e2430;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+        margin: 0;
+    }
+    .landing-logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00ff88, #00b8ff);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
-    .hero-subtitle {
-        font-size: 1.5rem;
+    .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+    .nav-links a {
         color: #94a3b8;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .nav-links a:hover {
+        color: #ffffff;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+        text-align: center;
+        padding: 4rem 2rem;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #00ff88, #00b8ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: #94a3b8;
+        margin-bottom: 2rem;
+    }
+    
+    /* Value Section */
+    .value-section {
+        padding: 4rem 2rem;
+        background-color: #0f131a;
+        border-top: 1px solid #1e2430;
+        border-bottom: 1px solid #1e2430;
+        margin: 2rem 0;
+    }
+    .value-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .value-card {
+        text-align: center;
+        padding: 1.5rem;
+    }
+    .value-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .value-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+    }
+    .value-desc {
+        color: #94a3b8;
+    }
+    
+    /* Features Section */
+    .features-section {
+        padding: 4rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 3rem;
+    }
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+    .feature-card {
+        background-color: #0f131a;
+        border: 1px solid #1e2430;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover {
+        border-color: #00ff88;
+        transform: translateY(-3px);
+    }
+    .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    .feature-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+    }
+    .feature-desc {
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+    
+    /* Footer */
+    .footer {
+        background-color: #0f131a;
+        border-top: 1px solid #1e2430;
+        padding: 2rem;
+        text-align: center;
+        color: #64748b;
+        margin-top: 3rem;
+    }
+    
+    /* ---------- AUTH CONTAINER (FIXED) ---------- */
+    /*.auth-container {
+        max-width: 450px !important;
+        width: 90% !important;
+        margin: 3rem auto !important;
+        background-color: #0f131a !important;
+        border: 1px solid #1e2430 !important;
+        border-radius: 16px !important;
+        padding: 2rem !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    }*/
+
+    .auth-header {
         text-align: center;
         margin-bottom: 2rem;
     }
-    .auth-container {
-        background-color: #1e2430;
-        padding: 2rem;
-        border-radius: 10px;
-        max-width: 400px;
-        margin: 0 auto;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        border: 1px solid #2a3340;
+
+    .auth-header h2 {
+        color: #ffffff !important;
+        margin-bottom: 0.5rem !important;
+        font-size: 2rem !important;
     }
-    .toggle-btn-container {
+
+    .auth-header p {
+        color: #94a3b8 !important;
+    }
+
+    /* Fix for Streamlit form elements inside auth container */
+    .auth-container .stTextInput > div > div > input {
+        background-color: #1e2430 !important;
+        color: white !important;
+        border: 1px solid #2a3340 !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+    }
+
+    .auth-container .stButton > button {
+        background: linear-gradient(135deg, #00ff88, #00b8ff) !important;
+        color: #0b0f15 !important;
+        font-weight: bold !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.75rem 1.5rem !important;
+        width: 100% !important;
+        transition: opacity 0.2s;
+    }
+
+    .auth-container .stButton > button:hover {
+        opacity: 0.9 !important;
+    }
+
+    .auth-container .stTabs [data-baseweb="tab-list"] {
+        gap: 2rem !important;
+        justify-content: center !important;
+        border-bottom: 1px solid #1e2430 !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .auth-container .stTabs [data-baseweb="tab"] {
+        color: #94a3b8 !important;
+        font-weight: 500 !important;
+    }
+
+    .auth-container .stTabs [aria-selected="true"] {
+        color: #00ff88 !important;
+    }
+
+    /* Remove any unwanted black bars above header */
+    .auth-container + div {
+        display: none !important;
+    }
+
+    div[data-testid="stVerticalBlock"] > div:first-child {
+        margin-top: 0 !important;
+    }
+
+    /* Main app header */
+    .main-header {
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00ff88, #00b8ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        margin-top: 0;
+    }
+    
+    /* Dataframe styling */
+    .stDataFrame { border-radius: 12px; overflow: hidden; }
+    .dataframe th { background-color: #1e2430 !important; color: #94a3b8 !important; font-weight: 600; padding: 8px 12px !important; }
+    .dataframe td { padding: 4px 12px !important; border-bottom: 1px solid #1e293b; line-height: 1.2 !important; }
+    .dataframe tr:hover { background-color: #1a1f2e !important; }
+    .success-message {
+        background-color: #1e3a2e;
+        color: #00ff88;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border-left: 4px solid #00ff88;
+    }
+    .score-card {
+        background-color: #1a1f2e;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin-bottom: 0.6rem;
         text-align: center;
-        margin-top: 1rem;
+        border-left: 3px solid;
+    }
+    .score-number {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    .score-card div:first-child {
+        font-size: 0.7rem;
+        opacity: 0.7;
+    }
+    .score-card div:last-child {
+        font-size: 0.7rem;
+    }
+    /* Spinner overlay styling */
+    .stSpinner > div {
+    border-top-color: #00ff88 !important;
+    }
+     /* Sidebar toggle button styling */
+    div[data-testid="stHorizontalBlock"]:has(button[kind="secondary"]) {
+        align-items: center;
+    }
+    button[kind="secondary"] {
+        background-color: transparent !important;
+        border: 1px solid #2a3340 !important;
+        color: #94a3b8 !important;
+        font-size: 18px !important;
+        padding: 4px 8px !important;
+    }
+    button[kind="secondary"]:hover {
+        background-color: #1e2430 !important;
+        color: white !important;
+    }
+    /* ================= SIDEBAR NAVIGATION CLEANUP ================= */
+    
+    /* 1. Remove all borders and shadows from the expander container */
+    [data-testid="stSidebar"] div[data-testid="stExpander"],
+    [data-testid="stSidebar"] div[data-testid="stExpander"] > details,
+    [data-testid="stSidebar"] div[data-testid="stExpander"] summary {
+        border: none !important;
+        border-color: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    
+    /* Remove border from the opened expander content area box */
+    [data-testid="stSidebar"] div[data-testid="stExpander"] > details > div {
+        border: none !important;
+        background-color: transparent !important;
+    }
+
+    /* Style the Expander Header Text */
+    [data-testid="stSidebar"] div[data-testid="stExpander"] summary p {
+        font-weight: 600 !important;
+        color: #94a3b8 !important;
+    }
+    [data-testid="stSidebar"] div[data-testid="stExpander"] summary:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-radius: 8px !important;
+    }
+    [data-testid="stSidebar"] div[data-testid="stExpander"] summary:hover p {
+        color: #ffffff !important;
+    }
+
+    /* 2. Style Radio Button Menus */
+    [data-testid="stSidebar"] .stRadio > div {
+        gap: 0.3rem !important;
+    }
+    
+    /* Hide the radio button native circles entirely */
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
+        display: none !important;
+    }
+
+    /* Reset the parent label container completely */
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
+        padding: 0 !important;
+        margin: 0 0 2px 0 !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Target the text wrapper directly for the base/inactive state */
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div {
+        padding: 0.6rem 1rem !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        width: 100% !important;
+    }
+
+    /* Inactive text color */
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div p {
+        color: #94a3b8 !important;
+        margin: 0 !important;
+    }
+    
+    /* Hover state for inactive items */
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover p {
+        color: #ffffff !important;
+    }
+    
+    /* ACTIVE / SELECTED NAVIGATION STATE */
+    /* Only targets the text div right next to a genuinely checked input */
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div {
+        background-color: #374151 !important; /* Solid grey active background */
+    }
+    
+    /* Active text highlight */
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div p {
+        color: #ffffff !important;
+        font-weight: 600 !important;
     }
 </style>
-"""
-st.markdown(base_css, unsafe_allow_html=True)
-
+""",
+    unsafe_allow_html=True,
+)
 # CSS to completely hide the sidebar toggle and container if NOT logged in
 if not is_authenticated:
     st.markdown(
