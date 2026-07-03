@@ -427,32 +427,24 @@ st.markdown(
         color: #ffffff !important;
         font-weight: 600 !important;
     }
-    /* 1. Hide the "app.py" link from the sidebar robustly */
-    [data-testid="stSidebarNav"] ul li:first-child,
-    [data-testid="stSidebarNav"] > div > a:first-child,
-    [data-testid="stSidebarNav"] a[href$="/app"],
-    [data-testid="stSidebarNav"] a[href$="/App"] {
-        display: none !important;
+    /* --- Hide the main "app" link from the sidebar --- */
+    [data-testid="stSidebarNav"] ul {
+    list-style: none;
+    padding-left: 0;
+    }
+    [data-testid="stSidebarNav"] ul li:first-child {
+    display: none !important;
     }
 
-    /* Hide any top title/header container generated inside the nav */
-    [data-testid="stSidebarNav"] > div:first-child {
-        display: none !important;
+    /* --- Increase font size of all sidebar navigation items --- */
+    [data-testid="stSidebarNav"] ul li a {
+    font-size: 1.2rem !important;      /* adjust as you like */
+    font-weight: 500 !important;
+    color: #e2e8f0 !important;
     }
-
-    /* 2. Increase the font size of all sidebar navigation text links */
-    /* Use a simpler selector (span) to ensure it overrides Streamlit's defaults */
-    [data-testid="stSidebarNav"] span {
-        font-size: 1.2rem !important; /* Adjust this value if you want it larger/smaller */
-        font-weight: 500 !important;
-        color: #e2e8f0 !important;
-    }
-
-    /* 3. Style the currently active sidebar link text size and color */
-    [data-testid="stSidebarNav"] a[aria-current="page"] span {
-        font-size: 1.2rem !important;
-        color: #00ff88 !important;
-        font-weight: 700 !important;
+    [data-testid="stSidebarNav"] ul li a[aria-current="page"] {
+    color: #00ff88 !important;
+    font-weight: 700 !important;
     }
 </style>
 """,
