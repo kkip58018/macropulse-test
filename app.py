@@ -446,6 +446,9 @@ st.markdown(
     color: #00ff88 !important;
     font-weight: 700 !important;
     }
+    [data-testid="stSidebarNav"] > div:first-child {
+    display: none !important;
+    }
 </style>
 """,
     unsafe_allow_html=True,
