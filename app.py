@@ -1,8 +1,24 @@
+# myapp/app.py
+
 import streamlit as st
 import time
 from streamlit_cookies_controller import CookieController
-from db import supabase_auth, supabase_admin, save_session,get_session_file,load_session
+import streamlit.components.v1 as components
+from db import supabase_auth, supabase_admin, save_session, get_session_file, load_session
 from analyzer import init_analyzer
+
+# ======================= HANDLE LOGOUT =======================
+# Check if we came back from a logout click
+if st.query_params.get("logout") == "true":
+    # Clear session state
+    st.session_state.authenticated = False
+    st.session_state.is_admin = False
+    # Remove cookie
+    controller = CookieController()
+    controller.remove("user_logged_in")
+    # Clear the query param
+    st.query_params.clear()
+    st.rerun()
 
 # ======================= PRE-CONFIG CHECK =======================
 # Check auth status BEFORE configuring the page to dynamically set sidebar
@@ -23,6 +39,78 @@ if "authenticated" not in st.session_state:
         st.session_state.authenticated = True
     else:
         st.session_state.authenticated = False
+
+# ======================= SIDEBAR CUSTOMIZATION (JavaScript) =======================
+def customize_sidebar():
+    """Inject JavaScript to rename 'app' to 'Logout', move to bottom, and increase font size."""
+    components.html(
+        """
+        <script>
+        (function() {
+            function modifySidebar() {
+                const navItems = document.querySelector('[data-testid="stSidebarNavItems"]');
+                if (!navItems) return;
+
+                const items = navItems.querySelectorAll('li');
+                if (items.length === 0) return;
+
+                // ---- 1. Rename the first item ("app") to "Logout" ----
+                const firstItem = items[0];
+                const link = firstItem.querySelector('a');
+                if (link) {
+                    const p = link.querySelector('p');
+                    if (p) p.textContent = 'Logout';
+                    else link.textContent = 'Logout';
+                }
+
+                // ---- 2. Move it to the bottom of the list ----
+                navItems.appendChild(firstItem);
+
+                // ---- 3. Increase font size and padding for ALL nav links ----
+                const allLinks = navItems.querySelectorAll('a');
+                allLinks.forEach(a => {
+                    a.style.fontSize = '1.4rem';
+                    a.style.padding = '0.8rem 1.2rem';
+                    a.style.display = 'block';
+                    a.style.color = '#e2e8f0';
+                    a.style.fontWeight = '500';
+                    // Keep active page highlight
+                    if (a.getAttribute('aria-current') === 'page') {
+                        a.style.color = '#00ff88';
+                        a.style.fontWeight = '700';
+                    }
+                });
+
+                // ---- 4. Make "Logout" actually log out ----
+                const logoutLink = navItems.querySelector('li:last-child a');
+                if (logoutLink) {
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Redirect to home with logout flag
+                        window.location.href = window.location.origin + '/?logout=true';
+                    });
+                }
+            }
+
+            // Run on load
+            if (document.readyState === 'complete') {
+                modifySidebar();
+            } else {
+                window.addEventListener('load', modifySidebar);
+            }
+
+            // Observe for changes (in case Streamlit re-renders the sidebar)
+            const observer = new MutationObserver(() => modifySidebar());
+            observer.observe(document.body, { childList: true, subtree: true });
+        })();
+        </script>
+        """,
+        height=0,
+    )
+
+# Call this only if the user is authenticated (so it's visible)
+if st.session_state.get("authenticated", False):
+    customize_sidebar()
 
 # ======================= GLOBAL STYLES =======================
 st.markdown(
@@ -204,29 +292,16 @@ st.markdown(
         margin-top: 3rem;
     }
     
-    /* ---------- AUTH CONTAINER (FIXED) ---------- */
-    /*.auth-container {
-        max-width: 450px !important;
-        width: 90% !important;
-        margin: 3rem auto !important;
-        background-color: #0f131a !important;
-        border: 1px solid #1e2430 !important;
-        border-radius: 16px !important;
-        padding: 2rem !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-    }*/
-
+    /* Auth Container */
     .auth-header {
         text-align: center;
         margin-bottom: 2rem;
     }
-
     .auth-header h2 {
         color: #ffffff !important;
         margin-bottom: 0.5rem !important;
         font-size: 2rem !important;
     }
-
     .auth-header p {
         color: #94a3b8 !important;
     }
@@ -239,7 +314,6 @@ st.markdown(
         border-radius: 8px !important;
         padding: 0.75rem !important;
     }
-
     .auth-container .stButton > button {
         background: linear-gradient(135deg, #00ff88, #00b8ff) !important;
         color: #0b0f15 !important;
@@ -250,34 +324,21 @@ st.markdown(
         width: 100% !important;
         transition: opacity 0.2s;
     }
-
     .auth-container .stButton > button:hover {
         opacity: 0.9 !important;
     }
-
     .auth-container .stTabs [data-baseweb="tab-list"] {
         gap: 2rem !important;
         justify-content: center !important;
         border-bottom: 1px solid #1e2430 !important;
         margin-bottom: 1.5rem !important;
     }
-
     .auth-container .stTabs [data-baseweb="tab"] {
         color: #94a3b8 !important;
         font-weight: 500 !important;
     }
-
     .auth-container .stTabs [aria-selected="true"] {
         color: #00ff88 !important;
-    }
-
-    /* Remove any unwanted black bars above header */
-    .auth-container + div {
-        display: none !important;
-    }
-
-    div[data-testid="stVerticalBlock"] > div:first-child {
-        margin-top: 0 !important;
     }
 
     /* Main app header */
@@ -325,9 +386,9 @@ st.markdown(
     }
     /* Spinner overlay styling */
     .stSpinner > div {
-    border-top-color: #00ff88 !important;
+        border-top-color: #00ff88 !important;
     }
-     /* Sidebar toggle button styling */
+    /* Sidebar toggle button styling */
     div[data-testid="stHorizontalBlock"]:has(button[kind="secondary"]) {
         align-items: center;
     }
@@ -342,9 +403,8 @@ st.markdown(
         background-color: #1e2430 !important;
         color: white !important;
     }
-    /* ================= SIDEBAR NAVIGATION CLEANUP ================= */
     
-    /* 1. Remove all borders and shadows from the expander container */
+    /* Sidebar expander styling */
     [data-testid="stSidebar"] div[data-testid="stExpander"],
     [data-testid="stSidebar"] div[data-testid="stExpander"] > details,
     [data-testid="stSidebar"] div[data-testid="stExpander"] summary {
@@ -354,14 +414,10 @@ st.markdown(
         box-shadow: none !important;
         outline: none !important;
     }
-    
-    /* Remove border from the opened expander content area box */
     [data-testid="stSidebar"] div[data-testid="stExpander"] > details > div {
         border: none !important;
         background-color: transparent !important;
     }
-
-    /* Style the Expander Header Text */
     [data-testid="stSidebar"] div[data-testid="stExpander"] summary p {
         font-weight: 600 !important;
         color: #94a3b8 !important;
@@ -374,17 +430,13 @@ st.markdown(
         color: #ffffff !important;
     }
 
-    /* 2. Style Radio Button Menus */
+    /* Radio buttons in sidebar */
     [data-testid="stSidebar"] .stRadio > div {
         gap: 0.3rem !important;
     }
-    
-    /* Hide the radio button native circles entirely */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
         display: none !important;
     }
-
-    /* Reset the parent label container completely */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
         padding: 0 !important;
         margin: 0 0 2px 0 !important;
@@ -392,8 +444,6 @@ st.markdown(
         border: none !important;
         box-shadow: none !important;
     }
-
-    /* Target the text wrapper directly for the base/inactive state */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div {
         padding: 0.6rem 1rem !important;
         border-radius: 8px !important;
@@ -401,57 +451,48 @@ st.markdown(
         cursor: pointer !important;
         width: 100% !important;
     }
-
-    /* Inactive text color */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div p {
         color: #94a3b8 !important;
         margin: 0 !important;
     }
-    
-    /* Hover state for inactive items */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover {
         background-color: rgba(255, 255, 255, 0.05) !important;
     }
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover p {
         color: #ffffff !important;
     }
-    
-    /* ACTIVE / SELECTED NAVIGATION STATE */
-    /* Only targets the text div right next to a genuinely checked input */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div {
-        background-color: #374151 !important; /* Solid grey active background */
+        background-color: #374151 !important;
     }
-    
-    /* Active text highlight */
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div p {
         color: #ffffff !important;
         font-weight: 600 !important;
     }
-     /* Hide the "app" link (first item) */
+
+    /* Hide the default "app" link using CSS as well (backup) */
     [data-testid="stSidebarNavItems"] > li:first-child {
-    display: none !important;
+        display: none !important;
+    }
+    /* Hide header spacers if any */
+    [data-testid="stSidebarNav"] > div:first-child {
+        display: none !important;
     }
 
-    /* Increase font size of all sidebar nav links */
+    /* Increase font size for all sidebar links (fallback) */
+    [data-testid="stSidebarNavItems"] a {
+        font-size: 1.4rem !important;
+        padding: 0.6rem 1rem !important;
+    }
     [data-testid="stSidebarNavItems"] a p {
-    font-size: 1.3rem !important;   /* adjust as needed */
-    font-weight: 500 !important;
-    color: #e2e8f0 !important;
-    }
-
-   /* Active page highlight */
-    [data-testid="stSidebarNavItems"] a[aria-current="page"] p {
-    color: #00ff88 !important;
-    font-weight: 700 !important;
-    }
-    [data-testid="stSidebarNavItems"] li:has(span[label="app"]) {
-    display: none !important;
+        font-size: inherit !important;
+        margin: 0 !important;
     }
 </style>
 """,
     unsafe_allow_html=True,
 )
-# CSS to completely hide the sidebar toggle and container if NOT logged in
+
+# Hide sidebar completely when not authenticated
 if not is_authenticated:
     st.markdown(
         """
@@ -481,35 +522,27 @@ def sign_in(email, password):
     try:
         response = supabase_auth.auth.sign_in_with_password({"email": email, "password": password})
         if response and response.session:
-            
             # 1. Check admin and approval status FIRST
             user_id = response.user.id
             profile = supabase_admin.table("user_profiles").select("approved, is_admin").eq("id", user_id).execute()
             
             if profile.data:
-                # If they are not approved, boot them out BEFORE setting any cookies
                 if not profile.data[0].get("approved", False):
-                    supabase_auth.auth.sign_out() # Optional but good practice: wipe the supabase session 
+                    supabase_auth.auth.sign_out()
                     return False, "Account pending approval. Please contact an admin."
-                
-                # Check if they are an admin
                 if profile.data[0].get("is_admin", False):
                     st.session_state.is_admin = True
             else:
                 return False, "User profile not found in database."
 
             save_session(response.session, email)
-            # When login is successful
             st.session_state.authenticated = True
-            # Put a flag in the browser's URL (e.g., yoursite.com/?auth=true)
-            st.query_params["auth"] = "true" 
+            st.query_params["auth"] = "true"
             st.switch_page("pages/01_Top_Setups.py")
-            
             return True, "Success"
-            
         return False, "Invalid credentials"
     except Exception as e:
-        return False, f"Login error: {str(e)}"  
+        return False, f"Login error: {str(e)}"
 
 def sign_up(email, password):
     try:
@@ -980,16 +1013,13 @@ def show_auth_page():
             submitted = st.form_submit_button("Log In", use_container_width=True)
             
             if submitted:
-                # Added .strip() to prevent accidental spaces from breaking auth
-                success, msg = sign_in(email.strip(), password) 
+                success, msg = sign_in(email.strip(), password)
                 if success:
                     st.session_state.authenticated = True
                     st.session_state.show_auth = False
                     st.success("Login successful! Redirecting...")
-                    time.sleep(0.5) 
-                    
-                    # 🔄 REPLACED st.switch_page with st.rerun()
-                    st.rerun() 
+                    time.sleep(0.5)
+                    st.rerun()
                 else:
                     st.error(msg)
 
@@ -1041,7 +1071,6 @@ def show_auth_page():
         st.session_state.auth_mode = "login"
         st.rerun()
 
-
 # ======================= MAIN APP ROUTING =======================
 if not st.session_state.authenticated:
     # If not logged in, show the gatekeeper screens and halt execution
@@ -1051,7 +1080,5 @@ if not st.session_state.authenticated:
         show_landing_page()
     st.stop()
 
+# If authenticated, redirect to the first page
 st.switch_page("pages/01_Top_Setups.py")
-
-
-
