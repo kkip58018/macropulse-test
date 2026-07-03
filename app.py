@@ -444,6 +444,9 @@ st.markdown(
     color: #00ff88 !important;
     font-weight: 700 !important;
     }
+    [data-testid="stSidebarNavItems"] li:has(span[label="app"]) {
+    display: none !important;
+    }
 </style>
 """,
     unsafe_allow_html=True,
