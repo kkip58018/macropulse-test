@@ -427,27 +427,22 @@ st.markdown(
         color: #ffffff !important;
         font-weight: 600 !important;
     }
-    /* --- Hide the main "app" link from the sidebar --- */
-    [data-testid="stSidebarNav"] ul {
-    list-style: none;
-    padding-left: 0;
-    }
-    [data-testid="stSidebarNav"] ul li:first-child {
+     /* Hide the "app" link (first item) */
+    [data-testid="stSidebarNavItems"] > li:first-child {
     display: none !important;
     }
 
-    /* --- Increase font size of all sidebar navigation items --- */
-    [data-testid="stSidebarNav"] ul li a {
-    font-size: 1.2rem !important;      /* adjust as you like */
+    /* Increase font size of all sidebar nav links */
+    [data-testid="stSidebarNavItems"] a p {
+    font-size: 1.3rem !important;   /* adjust as needed */
     font-weight: 500 !important;
     color: #e2e8f0 !important;
     }
-    [data-testid="stSidebarNav"] ul li a[aria-current="page"] {
+
+   /* Active page highlight */
+    [data-testid="stSidebarNavItems"] a[aria-current="page"] p {
     color: #00ff88 !important;
     font-weight: 700 !important;
-    }
-    [data-testid="stSidebarNav"] > div:first-child {
-    display: none !important;
     }
 </style>
 """,
