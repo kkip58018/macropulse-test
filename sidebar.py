@@ -51,6 +51,7 @@ def get_index(page_list):
     if active_display in page_list:
         return page_list.index(active_display)
     return None
+
 def inject_theme_css():
     """Injects the global dark mode styling required by all pages."""
     st.markdown(
@@ -108,8 +109,10 @@ def inject_theme_css():
     """,
         unsafe_allow_html=True,
     )
+
 def render():
     inject_theme_css()
+    
     # --- Ensure sidebar_visible is in session state ---
     if "sidebar_visible" not in st.session_state:
         st.session_state.sidebar_visible = True  # start open
@@ -126,83 +129,37 @@ def render():
     active_display = NORMALIZED_TO_DISPLAY.get(norm, "")
     st.session_state["_active_display"] = active_display
 
-    # --- Custom sidebar styling (radio buttons, expanders, etc.) ---
+    # --- Custom CSS for header and button ---
     st.markdown(
         """
         <style>
-        /* Hide native radio circles */
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
-            display: none !important;
+        /* Main header title */
+        .main-header {
+            font-size: 2.4rem !important;
+            font-weight: 700 !important;
+            background: linear-gradient(135deg, #00ff88, #00b8ff) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            margin-bottom: 0.5rem !important;
+            margin-top: 0 !important;
         }
-
-        /* Reset label container */
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
-            padding: 0 !important;
-            margin: 0 0 2px 0 !important;
+        
+        /* Open Sidebar button styling */
+        div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
             background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-
-        /* Style the text wrapper */
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div {
-            padding: 0.6rem 1rem !important;
-            border-radius: 8px !important;
-            transition: all 0.2s ease !important;
-            cursor: pointer !important;
+            border: 1px solid #2a3340 !important;
+            color: #94a3b8 !important;
+            font-size: 16px !important;
+            padding: 8px 16px !important;
+            border-radius: 6px !important;
             width: 100% !important;
-            font-size: 1.1rem !important;
-            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
         }
-
-        /* Inactive text color */
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div p {
-            color: #94a3b8 !important;
-            margin: 0 !important;
-        }
-
-        /* Hover state for inactive items */
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-        }
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover p {
+        div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
+            background-color: #1e2430 !important;
             color: #ffffff !important;
-        }
-
-        /* Active / selected state – grey background as in original */
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div {
-            background-color: #374151 !important;
-        }
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div p {
-            color: #ffffff !important;
-            font-weight: 600 !important;
-        }
-
-        /* Remove extra spacing between radio items */
-        [data-testid="stSidebar"] .stRadio > div {
-            gap: 0.3rem !important;
-        }
-
-        /* Expander styling */
-        [data-testid="stSidebar"] div[data-testid="stExpander"] summary p {
-            font-weight: 600 !important;
-            color: #94a3b8 !important;
-        }
-        [data-testid="stSidebar"] div[data-testid="stExpander"] summary:hover p {
-            color: #ffffff !important;
-        }
-
-        /* Remove default expander borders */
-        [data-testid="stSidebar"] div[data-testid="stExpander"],
-        [data-testid="stSidebar"] div[data-testid="stExpander"] > details,
-        [data-testid="stSidebar"] div[data-testid="stExpander"] summary {
-            border: none !important;
-            background-color: transparent !important;
-            box-shadow: none !important;
-        }
-        [data-testid="stSidebar"] div[data-testid="stExpander"] > details > div {
-            border: none !important;
-            background-color: transparent !important;
+            border-color: #00b8ff !important;
         }
         </style>
         """,
