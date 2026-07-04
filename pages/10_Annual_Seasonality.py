@@ -2,16 +2,23 @@ import streamlit as st
 import yfinance as yf
 import plotly.graph_objects as go
 from datetime import datetime
-from analyzer import init_analyzer as get_analyzer
 from config import *
 from utils import load_seasonality_data
+from sidebar import render as render_sidebar
+from analyzer import init_analyzer
 
+# ---------- Authentication guard ----------
 if not st.session_state.get("authenticated", False):
-    st.warning("Please log in on the Home page first.")
+    st.warning("Please log in first.")
     st.stop()
 
-analyzer = get_analyzer()
+# ---------- Render the custom sidebar ----------
+render_sidebar()
 
+# ---------- Get the analyzer ----------
+analyzer = init_analyzer()  # cached
+
+# ---------- Page content (copy from original) ----------
 
 # Title row with dropdown on far right
 title_col, dropdown_col = st.columns([3, 1])
