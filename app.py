@@ -419,6 +419,17 @@ st.markdown(
     [data-testid="stSidebarNav"] {
         display: none !important;
     }
+    /* Hide the default Streamlit sidebar navigation everywhere */
+    [data-testid="stSidebarNav"] {
+        display: none !important;
+    }
+    [data-testid="stSidebarNavItems"] {
+        display: none !important;
+    }
+    [data-testid="stSidebar"] {
+    background-color: #0f131a !important;  /* dark background */
+    border-right: 1px solid #1e2430 !important;
+    }
 </style>
 """,
     unsafe_allow_html=True,
