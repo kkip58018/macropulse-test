@@ -16,8 +16,7 @@ if not st.session_state.get("authenticated", False):
         <style>
             /* Completely remove the sidebar and toggle buttons on the login/landing page */
             [data-testid="stSidebar"], 
-            [data-testid="sidebar-toggle"], 
-            button[title="Expand sidebar"] {
+            [data-testid="sidebar-toggle"] {
                 display: none !important;
             }
             header[data-testid="stHeader"] {
