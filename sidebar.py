@@ -11,7 +11,7 @@ PAGE_DISPLAY_MAP = {
     "01_Top_Setups": "🏆 Top Setups",
     "02_Asset_Scorecard": "📋 Asset Scorecard",
     "03_Forex_Scorecard": "📊 Forex Scorecard",
-    "04_LatestCOT_Report": "📉 Latest COT Report",
+    "04_Latest_COT_Report": "📉 Latest COT Report",
     "05_COT_Trends": "📈 COT Trends",
     "06_COT_Data_History": "📊 COT Data history",
     "07_Eco_Suprise_index": "📈 Eco surprise index",
@@ -65,20 +65,14 @@ def render():
     active_display = NORMALIZED_TO_DISPLAY.get(norm, "")
     st.session_state["_active_display"] = active_display
 
-    # --- CRITICAL: Hide the default Streamlit sidebar navigation ---
+    # --- ONLY hide the default sidebar navigation (not the whole sidebar) ---
     st.markdown(
         """
         <style>
-            /* Hide the main nav element */
             [data-testid="stSidebarNav"] {
                 display: none !important;
             }
-            /* Hide the items inside it */
             [data-testid="stSidebarNavItems"] {
-                display: none !important;
-            }
-            /* Hide the container that holds the nav (just in case) */
-            section[data-testid="stSidebar"] > div:first-child {
                 display: none !important;
             }
         </style>
@@ -86,7 +80,7 @@ def render():
         unsafe_allow_html=True,
     )
 
-    # --- Custom sidebar styling (matches original) ---
+    # --- Custom sidebar styling (radio buttons, expanders, etc.) ---
     st.markdown(
         """
         <style>
@@ -143,7 +137,7 @@ def render():
             gap: 0.3rem !important;
         }
 
-        /* Expander header styling – ensure it matches original */
+        /* Expander styling */
         [data-testid="stSidebar"] div[data-testid="stExpander"] summary p {
             font-weight: 600 !important;
             color: #94a3b8 !important;
