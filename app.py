@@ -453,6 +453,9 @@ st.markdown(
     header[data-testid="stHeader"] {
         display: none !important;
     }
+    button[kind="header"] {
+    display: none !important;
+    }
 </style>
 """,
     unsafe_allow_html=True,
