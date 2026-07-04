@@ -5,7 +5,7 @@ from analyzer import init_analyzer
 
 # ---------- Authentication guard ----------
 if not st.session_state.get("authenticated", False):
-    st.switch_page("pages/"app.py")
+    st.switch_page("app.py")
     
 
 # ---------- Render the custom sidebar ----------
