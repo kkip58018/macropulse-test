@@ -105,34 +105,13 @@ def inject_theme_css():
         [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
             display: none !important;
         }
-        /* Force the 'Open Sidebar' button to be visible and white on dark backgrounds */
-        [data-testid="collapsedControl"] {
-            display: flex !important;
-            z-index: 999999 !important;
-        }
         
-        [data-testid="collapsedControl"] svg {
-            fill: #ffffff !important;
-            color: #ffffff !important;
-        }
-
-        /* Ensure the button has a slight hover effect so it feels clickable */
-        [data-testid="collapsedControl"]:hover {
-            background-color: rgba(255,255,255,0.1) !important;
-            border-radius: 8px !important;
-        }
     </style>
     """,
         unsafe_allow_html=True,
     )
-
 def render():
     inject_theme_css()
-    
-    # --- Ensure sidebar_visible is in session state ---
-    if "sidebar_visible" not in st.session_state:
-        st.session_state.sidebar_visible = True  # start open
-
     # --- Determine active page ---
     try:
         frame = inspect.currentframe().f_back
@@ -145,66 +124,106 @@ def render():
     active_display = NORMALIZED_TO_DISPLAY.get(norm, "")
     st.session_state["_active_display"] = active_display
 
-    # --- Custom CSS for header and button ---
+    # --- ONLY hide the default sidebar navigation (not the whole sidebar) ---
     st.markdown(
         """
         <style>
-        /* Main header title */
-        .main-header {
-            font-size: 2.4rem !important;
-            font-weight: 700 !important;
-            background: linear-gradient(135deg, #00ff88, #00b8ff) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-            margin-bottom: 0.5rem !important;
-            margin-top: 0 !important;
+            [data-testid="stSidebarNav"] {
+                display: none !important;
+            }
+            [data-testid="stSidebarNavItems"] {
+                display: none !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # --- Custom sidebar styling (radio buttons, expanders, etc.) ---
+    st.markdown(
+        """
+        <style>
+        /* Hide native radio circles */
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
+            display: none !important;
         }
-        
-        /* Open Sidebar button styling */
-        div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
+
+        /* Reset label container */
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
+            padding: 0 !important;
+            margin: 0 0 2px 0 !important;
             background-color: transparent !important;
-            border: 1px solid #2a3340 !important;
-            color: #94a3b8 !important;
-            font-size: 16px !important;
-            padding: 8px 16px !important;
-            border-radius: 6px !important;
-            width: 100% !important;
-            transition: all 0.2s ease !important;
+            border: none !important;
+            box-shadow: none !important;
         }
-        div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
-            background-color: #1e2430 !important;
+
+        /* Style the text wrapper */
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div {
+            padding: 0.6rem 1rem !important;
+            border-radius: 8px !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer !important;
+            width: 100% !important;
+            font-size: 1.1rem !important;
+            font-weight: 500 !important;
+        }
+
+        /* Inactive text color */
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div p {
+            color: #94a3b8 !important;
+            margin: 0 !important;
+        }
+
+        /* Hover state for inactive items */
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover p {
             color: #ffffff !important;
-            border-color: #00b8ff !important;
+        }
+
+        /* Active / selected state – grey background as in original */
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div {
+            background-color: #374151 !important;
+        }
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div p {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        /* Remove extra spacing between radio items */
+        [data-testid="stSidebar"] .stRadio > div {
+            gap: 0.3rem !important;
+        }
+
+        /* Expander styling */
+        [data-testid="stSidebar"] div[data-testid="stExpander"] summary p {
+            font-weight: 600 !important;
+            color: #94a3b8 !important;
+        }
+        [data-testid="stSidebar"] div[data-testid="stExpander"] summary:hover p {
+            color: #ffffff !important;
+        }
+
+        /* Remove default expander borders */
+        [data-testid="stSidebar"] div[data-testid="stExpander"],
+        [data-testid="stSidebar"] div[data-testid="stExpander"] > details,
+        [data-testid="stSidebar"] div[data-testid="stExpander"] summary {
+            border: none !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+        [data-testid="stSidebar"] div[data-testid="stExpander"] > details > div {
+            border: none !important;
+            background-color: transparent !important;
         }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-    # --- Render the main header row (title + toggle button) ---
-    sidebar_visible = st.session_state.sidebar_visible
-    col_title, col_toggle = st.columns([8, 2])
-    with col_title:
-        st.markdown('<div class="main-header">📊 MacroPulse</div>', unsafe_allow_html=True)
-    with col_toggle:
-        if not sidebar_visible:
-            if st.button("Open Sidebar", key="sidebar_expand", help="Show Sidebar"):
-                st.session_state.sidebar_visible = True
-                st.rerun()
-
-    # --- Sidebar content ---
-    # Sidebar header with close button (if visible)
-    if sidebar_visible:
-        col_nav, col_close = st.sidebar.columns([8, 1])
-        with col_nav:
-            st.sidebar.markdown("## Navigation")
-        with col_close:
-            if st.button("◀", key="sidebar_collapse", help="Hide Sidebar"):
-                st.session_state.sidebar_visible = False
-                st.rerun()
-    else:
-        st.sidebar.markdown("## Navigation")
+    # --- Sidebar header (Navigation) ---
+    st.sidebar.markdown("## Navigation")
 
     # --- Top main options (no expander) ---
     selected = st.sidebar.radio(
