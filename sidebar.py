@@ -80,6 +80,10 @@ def render():
             [data-testid="stSidebarNav"] {
                 display: none !important;
             }
+            /* Hide native radio circles */
+            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
+                display: none !important;
+            }
         </style>
         """,
         unsafe_allow_html=True,
