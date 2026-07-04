@@ -16,7 +16,7 @@ PAGE_DISPLAY_MAP = {
     "05_COT_Trends": "📈 COT Trends",
     "06_COT_Data_History": "📊 COT Data history",
     "07_Eco_Suprise_Index": "📈 Eco surprise index",
-    "08_Economic_Strength_Index": "🌍 Economic Strength Index",
+    "08_Eco_Strength_Index": "🌍 Economic Strength Index",
     "09_Monthly_Seasonality": "📅 Monthly Seasonality",
     "10_Annual_Seasonality": "📈 Annual Seasonality",
     "11_Retail_Sentiment": "🔄 Retail Sentiment",
@@ -106,6 +106,10 @@ def render():
             [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div p {
                 color: #94a3b8 !important;
                 margin: 0 !important;
+            }
+            /* Hover state for inactive items */
+            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover {
+                background-color: rgba(255, 255, 255, 0.05) !important;
             }
         </style>
         """,
