@@ -92,6 +92,16 @@ def render():
                 border: none !important;
                 box-shadow: none !important;
             }
+            /* Style the text wrapper */
+            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div {
+                padding: 0.6rem 1rem !important;
+                border-radius: 8px !important;
+                transition: all 0.2s ease !important;
+                cursor: pointer !important;
+                width: 100% !important;
+                font-size: 1.1rem !important;
+                font-weight: 500 !important;
+            }
         </style>
         """,
         unsafe_allow_html=True,
