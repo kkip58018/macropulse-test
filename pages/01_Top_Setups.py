@@ -15,6 +15,9 @@ render_sidebar()
 analyzer = init_analyzer()  # cached
 
 # ---------- Page content (copy from original) ----------
+if "sidebar_visible" not in st.session_state:
+    st.session_state.sidebar_visible = True
+
 col_title, col_toggle = st.columns([8, 2])
 with col_title:
     st.markdown('<div class="main-header">📊 MacroPulse</div>', unsafe_allow_html=True)
