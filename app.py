@@ -33,6 +33,9 @@ if not st.session_state.get("authenticated", False):
 st.markdown(
     """
 <style>
+     header[data-testid="stHeader"] {
+         display: none !important;
+     }
     /* Hide toolbar and decoration */
     [data-testid="stToolbar"] {
         display: none !important;
