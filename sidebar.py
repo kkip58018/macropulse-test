@@ -1,31 +1,44 @@
 # sidebar.py
 import streamlit as st
+import re
+from pathlib import Path
+import inspect
 from config import *
 from db import supabase_auth
-import time
 
-# ---------- Mapping from page script name to display name ----------
+# ---------- Mapping from page script name (without .py) to display name ----------
+# Keys are the actual filenames (case‑insensitive, underscores ignored)
 PAGE_DISPLAY_MAP = {
-    "1_Dashboard": "🏆 Top Setups",
-    "2_Asset_Scorecard": "📋 Asset Scorecard",
-    "3_Forex_Scorecard": "📊 Forex Scorecard",
-    "4_COT_Report": "📉 Latest COT Report",
-    "5_COT_Trends": "📈 COT Trends",
-    "6_COT_History": "📊 COT Data history",
-    "7_Eco_Surprise": "📈 Eco surprise index",
-    "8_Economic_Strength": "🌍 Economic Strength Index",
-    "9_Monthly_Seasonality": "📅 Monthly Seasonality",
+    "01_Top_Setups": "🏆 Top Setups",
+    "02_Asset_Scorecard": "📋 Asset Scorecard",
+    "03_Forex_Scorecard": "📊 Forex Scorecard",
+    "04_LatestCOT_Report": "📉 Latest COT Report",
+    "05_COT_Trends": "📈 COT Trends",
+    "06_COT_Data_History": "📊 COT Data history",
+    "07_Eco_Suprise_index": "📈 Eco surprise index",
+    "08_Economic_Strength_index": "🌍 Economic Strength Index",
+    "09_Monthly_Seasonality": "📅 Monthly Seasonality",
     "10_Annual_Seasonality": "📈 Annual Seasonality",
     "11_Retail_Sentiment": "🔄 Retail Sentiment",
-    "12_Put_Call_Ratio": "📊Put-Call Ratio",
+    "12_Put-Call_Ratio": "📊Put-Call Ratio",
     "13_Economic_Heatmap": "🔥 Economic Heatmap",
     "14_Economic_Calendar": "📅 Economic calendar",
     "15_Reload_Data": "🔄 Reload Data",
-    "16_Data_Updates": "✏️ Data Updates",
-    "17_Trend_Settings": "⚙️ Trend Settings",
-    "18_User_Approvals": "👥 User Approvals",
+    "Data_Updates": "✏️ Data Updates",
+    "Trend_Settings": "⚙️ Trend Settings",
+    "User_Approvals": "👥 User Approvals",
 }
+# Also create a normalized lookup (lowercase, remove underscores, remove numbers)
+def _normalize_key(key):
+    # Remove leading numbers and underscores, then lowercase and remove underscores
+    return re.sub(r'^[0-9_]+', '', key).replace('_', '').lower()
+
 DISPLAY_TO_SCRIPT = {v: k for k, v in PAGE_DISPLAY_MAP.items()}
+# Build a reverse lookup that works for any normalized form
+NORMALIZED_TO_DISPLAY = {}
+for script, display in PAGE_DISPLAY_MAP.items():
+    norm = _normalize_key(script)
+    NORMALIZED_TO_DISPLAY[norm] = display
 
 # ---------- Navigation groups (exactly as in original) ----------
 nav_main_top = ["🏆 Top Setups", "📋 Asset Scorecard", "📊 Forex Scorecard"]
@@ -45,9 +58,19 @@ def get_index(page_list):
 
 # ---------- The sidebar renderer ----------
 def render():
-    # 1. Determine active page from the current script path
-    page_script = st.page_info["page_script"].stem
-    active_display = PAGE_DISPLAY_MAP.get(page_script, "")
+    # 1. Determine the calling page script name
+    #    Use the caller's frame to get __file__
+    try:
+        frame = inspect.currentframe().f_back
+        caller_file = frame.f_globals['__file__']
+        page_script = Path(caller_file).stem
+    except Exception:
+        # Fallback: if we can't determine, use an empty string
+        page_script = ""
+
+    # Normalize the script name for lookup
+    norm = _normalize_key(page_script)
+    active_display = NORMALIZED_TO_DISPLAY.get(norm, "")
     st.session_state["_active_display"] = active_display
 
     # 2. CSS to hide the default sidebar nav
@@ -62,8 +85,7 @@ def render():
         unsafe_allow_html=True,
     )
 
-    # 3. Sidebar header with custom toggle (if you want)
-    # We'll just show the navigation heading
+    # 3. Sidebar header
     st.sidebar.markdown("## Navigation")
 
     # 4. Top main options (no expander)
