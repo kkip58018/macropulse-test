@@ -105,6 +105,22 @@ def inject_theme_css():
         [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
             display: none !important;
         }
+        /* Force the 'Open Sidebar' button to be visible and white on dark backgrounds */
+        [data-testid="collapsedControl"] {
+            display: flex !important;
+            z-index: 999999 !important;
+        }
+        
+        [data-testid="collapsedControl"] svg {
+            fill: #ffffff !important;
+            color: #ffffff !important;
+        }
+
+        /* Ensure the button has a slight hover effect so it feels clickable */
+        [data-testid="collapsedControl"]:hover {
+            background-color: rgba(255,255,255,0.1) !important;
+            border-radius: 8px !important;
+        }
     </style>
     """,
         unsafe_allow_html=True,
