@@ -20,6 +20,9 @@ if not st.session_state.get("authenticated", False):
             button[title="Expand sidebar"] {
                 display: none !important;
             }
+            header[data-testid="stHeader"] {
+            display: none !important;
+            }
         </style>
         """,
         unsafe_allow_html=True,
