@@ -11,11 +11,11 @@ PAGE_DISPLAY_MAP = {
     "01_Top_Setups": "🏆 Top Setups",
     "02_Asset_Scorecard": "📋 Asset Scorecard",
     "03_Forex_Scorecard": "📊 Forex Scorecard",
-    "04_Latest_COT_Report": "📉 Latest COT Report",
+    "04_LatestCOT_Report": "📉 Latest COT Report",
     "05_COT_Trends": "📈 COT Trends",
     "06_COT_Data_History": "📊 COT Data history",
-    "07_Eco_Suprise_Index": "📈 Eco surprise index",
-    "08_Eco_Strength_Index": "🌍 Economic Strength Index",
+    "07_Eco_Suprise_index": "📈 Eco surprise index",
+    "08_Economic_Strength_index": "🌍 Economic Strength Index",
     "09_Monthly_Seasonality": "📅 Monthly Seasonality",
     "10_Annual_Seasonality": "📈 Annual Seasonality",
     "11_Retail_Sentiment": "🔄 Retail Sentiment",
@@ -65,22 +65,7 @@ def render():
     active_display = NORMALIZED_TO_DISPLAY.get(norm, "")
     st.session_state["_active_display"] = active_display
 
-    # --- ONLY hide the default sidebar navigation (not the whole sidebar) ---
-    st.markdown(
-        """
-        <style>
-            [data-testid="stSidebarNav"] {
-                display: none !important;
-            }
-            [data-testid="stSidebarNavItems"] {
-                display: none !important;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # --- Custom sidebar styling (radio buttons, expanders, etc.) ---
+    # --- Custom sidebar styling (radio buttons, expanders) ---
     st.markdown(
         """
         <style>
