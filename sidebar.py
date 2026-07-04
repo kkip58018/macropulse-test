@@ -12,7 +12,7 @@ PAGE_DISPLAY_MAP = {
     "01_Top_Setups": "🏆 Top Setups",
     "02_Asset_Scorecard": "📋 Asset Scorecard",
     "03_Forex_Scorecard": "📊 Forex Scorecard",
-    "04_LatestCOT_Report": "📉 Latest COT Report",
+    "04_Latest_COT_Report": "📉 Latest COT Report",
     "05_COT_Trends": "📈 COT Trends",
     "06_COT_Data_History": "📊 COT Data history",
     "07_Eco_Suprise_index": "📈 Eco surprise index",
@@ -83,6 +83,14 @@ def render():
             /* Hide native radio circles */
             [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
                 display: none !important;
+            }
+            /* Remove default expander borders */
+            [data-testid="stSidebar"] div[data-testid="stExpander"],
+            [data-testid="stSidebar"] div[data-testid="stExpander"] > details,
+            [data-testid="stSidebar"] div[data-testid="stExpander"] summary {
+                border: none !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
             }
         </style>
         """,
