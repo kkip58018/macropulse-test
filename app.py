@@ -10,6 +10,20 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state=st.session_state.get("sidebar_state", "expanded"),
 )
+if not st.session_state.get("authenticated", False):
+    st.markdown(
+        """
+        <style>
+            /* Completely remove the sidebar and toggle buttons on the login/landing page */
+            [data-testid="stSidebar"], 
+            [data-testid="sidebar-toggle"], 
+            button[title="Expand sidebar"] {
+                display: none !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # ---------- CSS (hide header when unauthenticated, etc.) ----------
 
