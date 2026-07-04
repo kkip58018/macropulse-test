@@ -15,8 +15,8 @@ PAGE_DISPLAY_MAP = {
     "04_Latest_COT_Report": "📉 Latest COT Report",
     "05_COT_Trends": "📈 COT Trends",
     "06_COT_Data_History": "📊 COT Data history",
-    "07_Eco_Suprise_index": "📈 Eco surprise index",
-    "08_Economic_Strength_index": "🌍 Economic Strength Index",
+    "07_Eco_Suprise_Index": "📈 Eco surprise index",
+    "08_Economic_Strength_Index": "🌍 Economic Strength Index",
     "09_Monthly_Seasonality": "📅 Monthly Seasonality",
     "10_Annual_Seasonality": "📈 Annual Seasonality",
     "11_Retail_Sentiment": "🔄 Retail Sentiment",
@@ -101,6 +101,11 @@ def render():
                 width: 100% !important;
                 font-size: 1.1rem !important;
                 font-weight: 500 !important;
+            }
+            /* Inactive text color */
+            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div p {
+                color: #94a3b8 !important;
+                margin: 0 !important;
             }
         </style>
         """,
