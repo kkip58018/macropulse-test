@@ -1,15 +1,22 @@
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
-from analyzer import init_analyzer as get_analyzer
 from config import *
+from sidebar import render as render_sidebar
+from analyzer import init_analyzer
 
+# ---------- Authentication guard ----------
 if not st.session_state.get("authenticated", False):
-    st.warning("Please log in on the Home page first.")
+    st.warning("Please log in first.")
     st.stop()
 
-analyzer = get_analyzer()
+# ---------- Render the custom sidebar ----------
+render_sidebar()
 
+# ---------- Get the analyzer ----------
+analyzer = init_analyzer()  # cached
+
+# ---------- Page content (copy from original) ----------
 
 # Get the latest COT date from the database
 latest_db_date = "N/A"
