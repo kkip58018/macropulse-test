@@ -5,8 +5,8 @@ from analyzer import init_analyzer
 
 # ---------- Authentication guard ----------
 if not st.session_state.get("authenticated", False):
-    st.warning("Please log in first.")
-    st.stop()
+    st.switch_page("pages/"app.py")
+    
 
 # ---------- Render the custom sidebar ----------
 render_sidebar()
