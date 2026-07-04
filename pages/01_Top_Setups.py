@@ -14,19 +14,7 @@ render_sidebar()
 # ---------- Get the analyzer ----------
 analyzer = init_analyzer()  # cached
 
-# ---------- Page content (copy from original) ----------
-if "sidebar_visible" not in st.session_state:
-    st.session_state.sidebar_visible = True
-
-col_title, col_toggle = st.columns([8, 2])
-with col_title:
-    st.markdown('<div class="main-header">📊 MacroPulse</div>', unsafe_allow_html=True)
-with col_toggle:
-    if not st.session_state.sidebar_visible:
-        if st.button("Open Sidebar", key="sidebar_expand", help="Show Sidebar"):
-            st.session_state.sidebar_visible = True
-            st.rerun()
-            
+# ---------- Page content (copy from original) ----------         
 st.header("🏆 Top Setups")
 col1, col2 = st.columns([3, 1])
 with col1:
