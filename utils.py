@@ -1,10 +1,62 @@
 import streamlit as st
-import pandas as pd
 import yfinance as yf
+import pandas as pd
 import glob
+from db import supabase_auth, supabase_admin, save_session,get_session_file
 from datetime import datetime, timedelta
 from pathlib import Path
 from config import FOREX_PAIRS, CORE_INDICATORS, SCORING_ONLY_INDICATORS, EXTRA_INDICATORS, SCORING_EXCLUDED_INDICATORS, DIRECTION
+
+
+# ======================= AUTHENTICATION LOGIC =======================
+def sign_in(email, password):
+    try:
+        response = supabase_auth.auth.sign_in_with_password({"email": email, "password": password})
+        if response and response.session:
+            user_id = response.user.id
+            profile = supabase_admin.table("user_profiles").select("approved, is_admin").eq("id", user_id).execute()
+            if profile.data:
+                if not profile.data[0].get("approved", False):
+                    supabase_auth.auth.sign_out()
+                    return False, "Account pending approval. Please contact an admin."
+                if profile.data[0].get("is_admin", False):
+                    st.session_state.is_admin = True
+            else:
+                return False, "User profile not found in database."
+            save_session(response.session, email)
+            st.session_state.authenticated = True
+            st.query_params["auth"] = "true"
+            # We no longer switch page; we just stay on the main app
+            return True, "Success"
+        return False, "Invalid credentials"
+    except Exception as e:
+        return False, f"Login error: {str(e)}"
+
+def sign_up(email, password):
+    try:
+        response = supabase_auth.auth.sign_up({"email": email, "password": password})
+        if response and response.user:
+            return True, "Registration successful! Your account is pending admin approval."
+        return False, "Registration failed."
+    except Exception as e:
+        return False, f"Signup error: {str(e)}"
+    
+def sign_out():
+    try:
+        supabase_auth.auth.sign_out()
+    except:
+        pass
+    # Delete the session file for the current user
+    if st.session_state.get("user_email"):
+        file_path = get_session_file(st.session_state.user_email)
+        file_path.unlink(missing_ok=True)
+    st.session_state.authenticated = False
+    st.session_state.user_email = None
+    st.session_state.is_admin = False
+    st.session_state.show_auth = False
+    st.rerun()
+
+
 
 
 def normalize_pair(pair_str):
