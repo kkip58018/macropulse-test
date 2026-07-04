@@ -51,8 +51,65 @@ def get_index(page_list):
     if active_display in page_list:
         return page_list.index(active_display)
     return None
+def inject_theme_css():
+    """Injects the global dark mode styling required by all pages."""
+    st.markdown(
+        """
+    <style>
+        /* Hide toolbar and decoration */
+        [data-testid="stToolbar"] { display: none !important; }
+        [data-testid="stDecoration"] { display: none !important; }
+        
+        /* Base app background */
+        .stApp {
+            background-color: #0b0f15;
+            padding-top: 0 !important;
+        }
+        
+        /* Sidebar container styling */
+        [data-testid="stSidebar"] {
+            background-color: #0f131a !important;
+            border-right: 1px solid #1e2430 !important;
+        }
+        
+        /* Hide default sidebar nav links */
+        [data-testid="stSidebarNav"] {
+            display: none !important;
+        }
 
+        /* --- Your custom Expander & Radio Navigation Styling --- */
+        [data-testid="stSidebar"] div[data-testid="stExpander"],
+        [data-testid="stSidebar"] div[data-testid="stExpander"] > details,
+        [data-testid="stSidebar"] div[data-testid="stExpander"] summary {
+            border: none !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+        
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div {
+            padding: 0.6rem 1rem !important;
+            border-radius: 8px !important;
+        }
+
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div {
+            background-color: #374151 !important; /* Retain solid grey selection color */
+        }
+        
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div p {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Hide native radio circles */
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
+            display: none !important;
+        }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
 def render():
+    inject_theme_css()
     # --- Determine active page ---
     try:
         frame = inspect.currentframe().f_back
