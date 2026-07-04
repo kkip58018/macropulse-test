@@ -51,6 +51,7 @@ def get_index(page_list):
     if active_display in page_list:
         return page_list.index(active_display)
     return None
+
 def inject_theme_css():
     """Injects the global dark mode styling required by all pages."""
     st.markdown(
@@ -110,6 +111,10 @@ def inject_theme_css():
     )
 def render():
     inject_theme_css()
+    # --- Ensure sidebar_visible is in session state ---
+    if "sidebar_visible" not in st.session_state:
+        st.session_state.sidebar_visible = True  # start open
+
     # --- Determine active page ---
     try:
         frame = inspect.currentframe().f_back
@@ -121,21 +126,6 @@ def render():
     norm = _normalize_key(page_script)
     active_display = NORMALIZED_TO_DISPLAY.get(norm, "")
     st.session_state["_active_display"] = active_display
-
-    # --- ONLY hide the default sidebar navigation (not the whole sidebar) ---
-    st.markdown(
-        """
-        <style>
-            [data-testid="stSidebarNav"] {
-                display: none !important;
-            }
-            [data-testid="stSidebarNavItems"] {
-                display: none !important;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
 
     # --- Custom sidebar styling (radio buttons, expanders, etc.) ---
     st.markdown(
@@ -220,8 +210,29 @@ def render():
         unsafe_allow_html=True,
     )
 
-    # --- Sidebar header (Navigation) ---
-    st.sidebar.markdown("## Navigation")
+    # --- Render the main header row (title + toggle button) ---
+    sidebar_visible = st.session_state.sidebar_visible
+    col_title, col_toggle = st.columns([8, 2])
+    with col_title:
+        st.markdown('<div class="main-header">📊 MacroPulse</div>', unsafe_allow_html=True)
+    with col_toggle:
+        if not sidebar_visible:
+            if st.button("Open Sidebar", key="sidebar_expand", help="Show Sidebar"):
+                st.session_state.sidebar_visible = True
+                st.rerun()
+
+    # --- Sidebar content ---
+    # Sidebar header with close button (if visible)
+    if sidebar_visible:
+        col_nav, col_close = st.sidebar.columns([8, 1])
+        with col_nav:
+            st.sidebar.markdown("## Navigation")
+        with col_close:
+            if st.button("◀", key="sidebar_collapse", help="Hide Sidebar"):
+                st.session_state.sidebar_visible = False
+                st.rerun()
+    else:
+        st.sidebar.markdown("## Navigation")
 
     # --- Top main options (no expander) ---
     selected = st.sidebar.radio(
