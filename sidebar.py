@@ -80,41 +80,7 @@ def render():
             [data-testid="stSidebarNav"] {
                 display: none !important;
             }
-            /* Hide native radio circles */
-            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {
-                display: none !important;
-            }
-            /* Reset label container */
-            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
-                padding: 0 !important;
-                margin: 0 0 2px 0 !important;
-                background-color: transparent !important;
-                border: none !important;
-                box-shadow: none !important;
-            }
-            /* Style the text wrapper */
-            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div {
-                padding: 0.6rem 1rem !important;
-                border-radius: 8px !important;
-                transition: all 0.2s ease !important;
-                cursor: pointer !important;
-                width: 100% !important;
-                font-size: 1.1rem !important;
-                font-weight: 500 !important;
-            }
-            /* Inactive text color */
-            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input + div p {
-                color: #94a3b8 !important;
-                margin: 0 !important;
-            }
-            /* Hover state for inactive items */
-            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover {
-                background-color: rgba(255, 255, 255, 0.05) !important;
-            }
-            /* Active / selected state – grey background as in original */
-            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div {
-                background-color: #374151 !important;
-            }
+  
         </style>
         """,
         unsafe_allow_html=True,
