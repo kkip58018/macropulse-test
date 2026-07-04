@@ -2,12 +2,20 @@ import streamlit as st
 from datetime import datetime
 from analyzer import init_analyzer 
 from config import *
+from sidebar import render as render_sidebar
 
+# ---------- Authentication guard ----------
 if not st.session_state.get("authenticated", False):
-    st.warning("Please log in on the Home page first.")
+    st.warning("Please log in first.")
     st.stop()
 
-analyzer = init_analyzer()
+# ---------- Render the custom sidebar ----------
+render_sidebar()
+
+# ---------- Get the analyzer ----------
+analyzer = init_analyzer()  # cached
+
+# ---------- Page content (copy from original) ----------
 
 st.header("✏️ Update Market Data")
 update_type = st.selectbox(
