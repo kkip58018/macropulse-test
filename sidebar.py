@@ -65,7 +65,28 @@ def render():
     active_display = NORMALIZED_TO_DISPLAY.get(norm, "")
     st.session_state["_active_display"] = active_display
 
-    # --- Custom CSS to match original sidebar styling ---
+    # --- CRITICAL: Hide the default Streamlit sidebar navigation ---
+    st.markdown(
+        """
+        <style>
+            /* Hide the main nav element */
+            [data-testid="stSidebarNav"] {
+                display: none !important;
+            }
+            /* Hide the items inside it */
+            [data-testid="stSidebarNavItems"] {
+                display: none !important;
+            }
+            /* Hide the container that holds the nav (just in case) */
+            section[data-testid="stSidebar"] > div:first-child {
+                display: none !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # --- Custom sidebar styling (matches original) ---
     st.markdown(
         """
         <style>
@@ -90,7 +111,7 @@ def render():
             transition: all 0.2s ease !important;
             cursor: pointer !important;
             width: 100% !important;
-            font-size: 1.1rem !important;   /* increased font size */
+            font-size: 1.1rem !important;
             font-weight: 500 !important;
         }
 
@@ -122,7 +143,7 @@ def render():
             gap: 0.3rem !important;
         }
 
-        /* Expander header styling (already in global CSS, but ensure it's applied) */
+        /* Expander header styling – ensure it matches original */
         [data-testid="stSidebar"] div[data-testid="stExpander"] summary p {
             font-weight: 600 !important;
             color: #94a3b8 !important;
@@ -130,12 +151,25 @@ def render():
         [data-testid="stSidebar"] div[data-testid="stExpander"] summary:hover p {
             color: #ffffff !important;
         }
+
+        /* Remove default expander borders */
+        [data-testid="stSidebar"] div[data-testid="stExpander"],
+        [data-testid="stSidebar"] div[data-testid="stExpander"] > details,
+        [data-testid="stSidebar"] div[data-testid="stExpander"] summary {
+            border: none !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+        [data-testid="stSidebar"] div[data-testid="stExpander"] > details > div {
+            border: none !important;
+            background-color: transparent !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-    # --- Sidebar header (optional close button – you can add if you want) ---
+    # --- Sidebar header (Navigation) ---
     st.sidebar.markdown("## Navigation")
 
     # --- Top main options (no expander) ---
