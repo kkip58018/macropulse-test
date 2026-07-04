@@ -111,6 +111,10 @@ def render():
             [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:not(:checked) + div:hover {
                 background-color: rgba(255, 255, 255, 0.05) !important;
             }
+            /* Active / selected state – grey background as in original */
+            [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label input:checked + div {
+                background-color: #374151 !important;
+            }
         </style>
         """,
         unsafe_allow_html=True,
