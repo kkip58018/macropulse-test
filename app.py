@@ -444,6 +444,15 @@ st.markdown(
     background-color: #0f131a !important;  /* dark background */
     border-right: 1px solid #1e2430 !important;
     }
+    [data-testid="stToolbar"] {
+    display: none !important;
+    }
+    [data-testid="stDecoration"] {
+        display: none !important;
+    }
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
 </style>
 """,
     unsafe_allow_html=True,
